@@ -5,54 +5,53 @@ public class Main {
     public static void main(String[] args) throws Exception{
         BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
         
-        String a =" "+br.readLine();
-        String b =" "+br.readLine();
-        int n = a.length()-1;
-        int m = b.length()-1;
+        String a =br.readLine();
+        String b =br.readLine();
+        int n = a.length();
+        int m = b.length();
 
-        String[][] dp = new String[n+1][m+1];
-        for(int i=0;i<=n;i++){
-            for(int j=0;j<=m;j++){
-                dp[i][j]="";
-            }
-        }
+        int[][] dp = new int[n+1][m+1];
+        int[][][] path = new int[n+1][m+1][2];
 
-        if(a.charAt(1) == b.charAt(1)){
-            dp[1][1]+=a.charAt(1);
-        }
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                if(dp[i][j] < dp[i-1][j]){
+                    dp[i][j] = dp[i-1][j];
+                    path[i][j][0]=i-1;
+                    path[i][j][1]=j;
+                }
 
-        for(int i=2; i<=n; i++){
-            if(a.charAt(i) == b.charAt(1)){
-                dp[i][1]+=a.charAt(i);
-            }else dp[i][1]=dp[i-1][1];
-        }
+                if(dp[i][j] < dp[i][j-1]){
+                    dp[i][j] = dp[i][j-1];
+                    path[i][j][0]=i;
+                    path[i][j][1]=j-1;
+                }
 
-        for(int j=2; j<=m; j++){
-            if(a.charAt(1) == b.charAt(j)){
-                dp[1][j]+=a.charAt(1);
-            }else dp[1][j]=dp[1][j-1];
-        }
-
-        for(int i=2; i<=n; i++){
-            for(int j=2; j<=m; j++){
-                if(a.charAt(i) == b.charAt(j)){
-                    dp[i][j]=dp[i-1][j-1];
-                    dp[i][j]+=a.charAt(i);
-                }else{
-                    int left =dp[i-1][j].length();
-                    int right = dp[i][j-1].length();
-
-                    if(left <= right){
-                        dp[i][j]=dp[i-1][j];
-                        dp[i][j]+=a.charAt(i);
-                    }else{
-                        dp[i][j]=dp[i][j-1];
-                        dp[i][j]+=a.charAt(i);
-                    }
+                if(a.charAt(i-1) == b.charAt(j-1) && dp[i][j] < dp[i-1][j-1] + 1){
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                    path[i][j][0]=i-1;
+                    path[i][j][1]=j-1;
                 }
             }
         }
 
-        System.out.println(dp[n][m]);
+        List<Character> lcs = new ArrayList<>();
+            for(int i=n, j=m; i > 0 && j > 0;){
+                if(path[i][j][0] == i-1 && path[i][j][1] == j-1 && a.charAt(i-1) == b.charAt(j-1)){
+                    lcs.add(a.charAt(i-1));
+                    i--;j--;
+                }else{
+                    int ni=path[i][j][0];
+                    int nj=path[i][j][1];
+
+                    i=ni;
+                    j=nj;
+                }
+            }
+
+        for(int i=lcs.size()-1; i>=0; i--){
+            System.out.print(lcs.get(i));
+
+        }
     }
 }
